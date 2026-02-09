@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+from st_copy_to_clipboard import st_copy_to_clipboard # Import the new tool
 
 # UI Branding
 st.set_page_config(page_title="Content Alchemist", page_icon="🧪", layout="wide") # 'wide' helps with columns
@@ -47,6 +48,14 @@ if st.button("Transmute to Summary"):
                         
                         # Display text normally
                         st.write(summary_text)
+
+                        # Add a "Copy to Clipboard"
+                        st.caption("Click the icon below to copy summary:")
+                        st_copy_to_clipboard(
+                            summary_text, 
+                            before_copy_label="📋 Copy Summary", 
+                            after_copy_label="✅ Copied to Clipboard!"
+                        )
 
                     with col2:
                         st.subheader("✨ Key Takeaways")
