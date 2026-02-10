@@ -27,3 +27,11 @@ class SummaryResponse(BaseModel):
         ..., 
         description="A catchy, AI-generated title for this specific summary."
     )
+    transcript: str = Field(
+        ..., 
+        description="The original transcript of the video"
+    )
+    is_short: bool = Field(
+        False, 
+        description="Flag to identify if the video is a YouTube Short"
+    )

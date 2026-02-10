@@ -16,7 +16,7 @@ router = APIRouter(prefix="/api/v1", tags=["Summarization"])
 async def summarize_video(request: SummaryRequest):
     # Extract the ID from the URL provided in the request body
     video_id = extract_video_id(request.url)
-    
+    is_short = "youtube.com/shorts/" in request.url
     if not video_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -26,7 +26,7 @@ async def summarize_video(request: SummaryRequest):
     try:
         # Call the LLM service (which internally fetches the transcript)
         # This returns a SummaryResponse Pydantic object
-        result = get_summary(video_id)
+        result = get_summary(video_id, is_short)
         return result
         
     except Exception as e:

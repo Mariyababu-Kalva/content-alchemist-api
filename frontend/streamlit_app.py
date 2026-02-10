@@ -39,10 +39,15 @@ if st.button("Transmute to Summary"):
                     st.header(data.get("title", "Summary Result"))
                     st.divider()
 
-                    # Two Column Layout
-                    col1, col2 = st.columns([1.5, 1], gap="large")
+                    # --- ENHANCED TABBED LAYOUT ---
+                    # Organizes content into three distinct sections for better user engagement
+                    tab_summary, tab_points, tab_transcript = st.tabs([
+                        "📝 Summary", 
+                        "✨ Key Takeaways", 
+                        "📜 Transcript"
+                    ])
 
-                    with col1:
+                    with tab_summary:
                         st.subheader("📝 Summary")
                         summary_text = data.get("summary", "No summary available.")
                         
@@ -57,15 +62,44 @@ if st.button("Transmute to Summary"):
                             after_copy_label="✅ Copied to Clipboard!"
                         )
 
-                    with col2:
+                    with tab_points:
                         st.subheader("✨ Key Takeaways")
                         points = data.get("key_points", [])
                         if points:
+                            # Create a single string of points for the copy-to-clipboard functionality
+                            points_string = "\n".join([f"• {p}" for p in points])
+                            
                             for point in points:
                                 # Creates nice colored boxes for key points
                                 st.info(point)
+                            
+                            # Allow user to copy all key takeaways at once
+                            st_copy_to_clipboard(
+                                points_string,
+                                before_copy_label="📋 Copy All Key Takeaways",
+                                after_copy_label="✅ Takeaways Copied!"
+                            )
                         else:
                             st.info("The Alchemist didn't find specific key points.")
+
+                    with tab_transcript:
+                        # Logic to display transcript only for Shorts to keep UI clean
+                        if data.get("is_short"):
+                            st.subheader("📜 Transcript")
+                            transcript_text = data.get("transcript", "No transcript available.")
+                            
+                            # Copy tool for the full transcript
+                            st_copy_to_clipboard(
+                                transcript_text,
+                                before_copy_label="📋 Copy Full Transcript",
+                                after_copy_label="✅ Transcript Copied!"
+                            )
+                            
+                            # Display transcript in a scrollable container for better UX
+                            st.container(height=400).write(transcript_text)
+                        else:
+                            # Informative note for long-form videos
+                            st.info("💡 Transcript hidden for brevity as this is a long-form video.")
                     # ------------------------------
 
                 else:

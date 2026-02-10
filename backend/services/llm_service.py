@@ -10,7 +10,7 @@ client = genai.Client(
     http_options=types.HttpOptions(api_version="v1alpha") # Force v1 to avoid 404s
 )
 
-def get_summary(video_id: str)-> SummaryResponse:
+def get_summary(video_id: str, is_short: bool)-> SummaryResponse:
     transcript = fetch_transcript(video_id)
     
     # We remove the conversational request and replace it with a command
@@ -37,5 +37,7 @@ def get_summary(video_id: str)-> SummaryResponse:
 
     # Ensure the video_id is set (since Gemini only reads the transcript text)
     result.video_id = video_id
+    result.transcript = transcript
+    result.is_short = is_short
 
     return result
