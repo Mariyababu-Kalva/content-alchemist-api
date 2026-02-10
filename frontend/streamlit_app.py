@@ -88,15 +88,15 @@ if st.button("Transmute to Summary"):
                             st.subheader("📜 Transcript")
                             transcript_text = data.get("transcript", "No transcript available.")
                             
+                            # Display transcript in a scrollable container for better UX
+                            st.container(height=400).write(transcript_text)
+
                             # Copy tool for the full transcript
                             st_copy_to_clipboard(
                                 transcript_text,
                                 before_copy_label="📋 Copy Full Transcript",
                                 after_copy_label="✅ Transcript Copied!"
                             )
-                            
-                            # Display transcript in a scrollable container for better UX
-                            st.container(height=400).write(transcript_text)
                         else:
                             # Informative note for long-form videos
                             st.info("💡 Transcript hidden for brevity as this is a long-form video.")
