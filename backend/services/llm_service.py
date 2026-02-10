@@ -28,6 +28,9 @@ def get_summary(video_id: str, is_short: bool)-> SummaryResponse:
                 "The 'summary' field must be a cohesive paragraph. "
                 "The 'key_points' must be a list of 3-5 strings. "
                 "The 'title' must be a professional heading."
+                "If the video is a Short, the 'transcript' field should be a polished version "
+                "with proper punctuation and paragraphs. If it is NOT a Short, return "
+                "an empty string for the 'transcript' field."
             )
         )
     )
@@ -37,7 +40,10 @@ def get_summary(video_id: str, is_short: bool)-> SummaryResponse:
 
     # Ensure the video_id is set (since Gemini only reads the transcript text)
     result.video_id = video_id
-    result.transcript = transcript
+    
+    if not is_short:
+        result.transcript = ""
+    
     result.is_short = is_short
 
     return result

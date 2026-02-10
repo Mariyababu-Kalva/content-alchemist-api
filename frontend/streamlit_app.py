@@ -85,7 +85,10 @@ if st.button("Transmute to Summary"):
                     with tab_transcript:
                         # Logic to display transcript only for Shorts to keep UI clean
                         if data.get("is_short"):
-                            st.subheader("📜 Transcript")
+                            st.subheader("📜 Refined Transcript")
+                            # Added a small note to explain the quality improvement
+                            st.caption("The Alchemist has polished this scroll for readability while preserving every original word.")
+                            
                             transcript_text = data.get("transcript", "No transcript available.")
                             
                             # Display transcript in a scrollable container for better UX
