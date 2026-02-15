@@ -25,12 +25,18 @@ def get_summary(video_id: str, is_short: bool)-> SummaryResponse:
             system_instruction=(
                 "You are a data extraction engine. Input: YouTube transcript. "
                 "Output: JSON following the schema precisely. "
-                "The 'summary' field must be a cohesive paragraph. "
-                "The 'key_points' must be a list of 3-5 strings. "
-                "The 'title' must be a professional heading."
-                "If the video is a Short, the 'transcript' field should be a polished version "
-                "with proper punctuation and paragraphs. If it is NOT a Short, return "
-                "an empty string for the 'transcript' field."
+                "SCHEMA: { 'status': 'success' | 'error', 'title': string, 'summary': string, 'key_points': list, 'is_short': boolean, 'transcript': string } "
+                "LOGIC: "
+                "1. If a valid transcript is provided: set 'status' to 'success'. "
+                "   The 'summary' must be a cohesive paragraph. "
+                "   The 'key_points' must be 3-5 strings. "
+                "   The 'title' must be a professional heading. "
+                "2. If the input is empty, invalid, or says 'transcript unavailable': set 'status' to 'error'. "
+                "   Set 'title' to 'Transmutation Failed'. "
+                "   Set 'summary' to a brief explanation of why it failed. "
+                "   Set 'key_points' to an empty list []. "
+                "3. TRANSCRIPT HANDLING: If it is a Short, provide a polished 'transcript'. "
+                "   Otherwise, return an empty string for 'transcript'."
             )
         )
     )

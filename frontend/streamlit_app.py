@@ -57,76 +57,91 @@ if st.button("Transmute to Summary"):
                 # Handle connection failures (e.g., backend server is down)
                 status.update(label="Connection Error!", state="error")
                 st.error("📡 **Communication Lost!** The Alchemist's lab is currently silent. Please ensure the transformation engine is active and try again.", icon="🔌")
-        if data:
-            # Show the Main Title
-            st.header(data.get("title", "Summary Result"))
-            st.divider()
+        if data is not None:
+            if data.get('status', 'error') == 'success':
+                # Show the Main Title
+                st.header(data.get('title', 'Summary Result'))
+                st.divider()
 
-            # --- ENHANCED TABBED LAYOUT ---
-            # Organizes content into three distinct sections for better user engagement
-            tab_summary, tab_points, tab_transcript = st.tabs([
-                "📝 Summary", 
-                "✨ Key Takeaways", 
-                "📜 Transcript"
-            ])
+                # --- ENHANCED TABBED LAYOUT ---
+                # Organizes content into three distinct sections for better user engagement
+                tab_summary, tab_points, tab_transcript = st.tabs([
+                    "📝 Summary", 
+                    "✨ Key Takeaways", 
+                    "📜 Transcript"
+                ])
 
-            with tab_summary:
-                st.subheader("📝 Summary")
-                summary_text = data.get("summary", "No summary available.")
+                '''
+                Display summary:
+                - Allow user to copy summary
+                '''
+                with tab_summary:
+                    st.subheader("📝 Summary")
+                    st.write(data.get("summary"))
 
-                # Display text normally
-                st.write(summary_text)
-
-                # Add a "Copy to Clipboard"
-                st.caption("Click the icon below to copy summary:")
-                st_copy_to_clipboard(
-                    summary_text, 
-                    before_copy_label="📋 Copy Summary", 
-                    after_copy_label="✅ Copied to Clipboard!"
-                )
-
-            with tab_points:
-                st.subheader("✨ Key Takeaways")
-                points = data.get("key_points", [])
-                if points:
-                    # Create a single string of points for the copy-to-clipboard functionality
-                    points_string = "\n".join([f"• {p}" for p in points])
-
-                    for point in points:
-                        # Creates nice colored boxes for key points
-                        st.info(point)
-
-                    # Allow user to copy all key takeaways at once
+                    st.caption("Click the icon below to copy summary:")
                     st_copy_to_clipboard(
-                        points_string,
-                        before_copy_label="📋 Copy All Key Takeaways",
-                        after_copy_label="✅ Takeaways Copied!"
+                        data.get("summary"), 
+                        before_copy_label="📋 Copy Summary", 
+                        after_copy_label="✅ Copied to Clipboard!"
                     )
-                else:
-                    st.info("The Alchemist didn't find specific key points.")
+ 
+                '''
+                Display key points:
+                - Create a single string of points for the copy-to-clipboard functionality
+                - Creates colored boxes for key points
+                - Allow user to copy all key takeaways at once
+                '''
+                with tab_points:
+                    st.subheader("✨ Key Takeaways")
+                    points = data.get("key_points", [])
+                    if points:
+                        points_string = "\n".join([f"• {p}" for p in points])
 
-            with tab_transcript:
-                # Logic to display transcript only for Shorts to keep UI clean
-                if data.get("is_short"):
-                    st.subheader("📜 Refined Transcript")
-                    # Added a small note to explain the quality improvement
-                    st.caption("The Alchemist has polished this scroll for readability while preserving every original word.")
+                        for point in points:
+                            st.info(point)
 
-                    transcript_text = data.get("transcript", "No transcript available.")
+                        st_copy_to_clipboard(
+                            points_string,
+                            before_copy_label="📋 Copy All Key Takeaways",
+                            after_copy_label="✅ Takeaways Copied!"
+                        )
+                    else:
+                        st.info("The Alchemist didn't find specific key points.")
 
-                    # Display transcript in a scrollable container for better UX
-                    st.container(height=400).write(transcript_text)
+                '''
+                Display transcript:
+                - Logic to display transcript only for Shorts to keep UI clean
+                - Display transcript in a scrollable container for better UX
+                - Add a small note to explain the quality improvement
+                - Allow user to copy transcript
+                - Informative note for long-form videos
+                '''
+                with tab_transcript:
+                    if data.get("is_short"):
+                        st.subheader("📜 Refined Transcript")
+                        transcript_text = data.get("transcript", "[]")
 
-                    # Copy tool for the full transcript
-                    st_copy_to_clipboard(
-                        transcript_text,
-                        before_copy_label="📋 Copy Full Transcript",
-                        after_copy_label="✅ Transcript Copied!"
-                    )
-                else:
-                    # Informative note for long-form videos
-                    st.info("💡 Transcript hidden for brevity as this is a long-form video.")
-            # ------------------------------
+                        if transcript_text:
+                            st.container(height=250).write(transcript_text)
+
+                            st.caption("The Alchemist has polished this scroll for readability while preserving every original word.")
+
+                            st_copy_to_clipboard(
+                                transcript_text,
+                                before_copy_label="📋 Copy Full Transcript",
+                                after_copy_label="✅ Transcript Copied!"
+                            )
+                        else:
+                            st.info("📜 **Empty Scroll:** This video contains no spoken essence for the Alchemist to transmute.")
+                    else:
+                        st.info("💡 Transcript hidden for brevity as this is a long-form video.")
+                # ------------------------------
+            else:
+                fallback_title = "Transmutation Halted"
+                st.warning(f"🧙‍♂️ **Alchemist Note:** {data.get('title', fallback_title)}")
+                
+                fallback_summary = "The laboratory was unable to extract the video's essence. Please check the URL."
+                st.info(data.get("summary", fallback_summary))
     else:
-        # Use a 'Toast' for a less intrusive warning when the input is empty
         st.toast("Please provide a YouTube link first!", icon="🧪")
