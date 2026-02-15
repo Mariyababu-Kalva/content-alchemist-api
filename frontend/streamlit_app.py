@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import time
 from st_copy_to_clipboard import st_copy_to_clipboard # Import the new tool
 
 # UI Branding
@@ -24,6 +25,7 @@ with st.sidebar:
 # Action Button
 if st.button("Transmute to Summary"):
     if video_url:
+        start_time = time.time()
         data = None
         with st.status("The Alchemist is at work...", expanded=True) as status:
             try:
@@ -36,8 +38,9 @@ if st.button("Transmute to Summary"):
                 if response.status_code == 200:
                     st.write("⚗️ Distilling insights with Gemini AI...")
                     data = response.json()
-                    status.update(label="Transmutation Complete!", state="complete", expanded=False)
-                    st.balloons()
+
+                    duration = round(time.time() - start_time, 2)
+                    status.update(label=f"Transmutation Complete in {duration}s!", state="complete", expanded=False)
                 else:
                     status.update(label="Transmutation Failed!", state="error")
                     # Extract the error detail from the backend response
