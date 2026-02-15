@@ -30,8 +30,6 @@ if st.button("Transmute to Summary"):
         with st.status("The Alchemist is at work...", expanded=True) as status:
             try:
                 st.write("🔍 Extracting essence from YouTube...")
-
-                # Send the URL to our FastAPI /api/v1/summarize endpoint
                 payload = {"url": video_url}
                 response = requests.post("http://127.0.0.1:8000/api/v1/summarize", json=payload)
 
@@ -43,28 +41,29 @@ if st.button("Transmute to Summary"):
                     status.update(label=f"Transmutation Complete in {duration}s!", state="complete", expanded=False)
                 else:
                     status.update(label="Transmutation Failed!", state="error")
-                    # Extract the error detail from the backend response
+                    
                     error_detail = response.json().get('detail', 'The transmutation failed.')
-
-                    # Provide user-friendly guidance based on the error type
                     if "Invalid YouTube URL" in error_detail:
                         st.error("🧙‍♂️ **The Alchemist is puzzled!** That link doesn't seem to lead to a valid YouTube video. Please check the URL and try again.", icon="⚠️")
                     elif "quota" in error_detail.lower():
                         st.warning("⚖️ **Laboratory Overloaded!** We've reached our maximum AI power for now. Please try again in a few minutes.", icon="⏳")
                     else:
                         st.error(f"🧪 **Lab Error:** {error_detail}", icon="❌")
+
             except Exception as e:
-                # Handle connection failures (e.g., backend server is down)
                 status.update(label="Connection Error!", state="error")
                 st.error("📡 **Communication Lost!** The Alchemist's lab is currently silent. Please ensure the transformation engine is active and try again.", icon="🔌")
+                data = None
+
         if data is not None:
             if data.get('status', 'error') == 'success':
-                # Show the Main Title
+                '''
+                - Show main title
+                - Organizes content into three distinct sections for better user engagement
+                '''
                 st.header(data.get('title', 'Summary Result'))
                 st.divider()
 
-                # --- ENHANCED TABBED LAYOUT ---
-                # Organizes content into three distinct sections for better user engagement
                 tab_summary, tab_points, tab_transcript = st.tabs([
                     "📝 Summary", 
                     "✨ Key Takeaways", 
