@@ -10,6 +10,10 @@ class SummaryRequest(BaseModel):
 
 class SummaryResponse(BaseModel):
     """Schema for the structured AI output and API response."""
+    status: str = Field(
+        "success",
+        description="The status of the transmutation: 'success' or 'error'."
+    )
     video_id: str = Field(
         ..., 
         description="The unique 11-character YouTube video ID."
