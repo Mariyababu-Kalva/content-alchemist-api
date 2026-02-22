@@ -11,16 +11,37 @@ st.markdown("### The AI-Powered YouTube Distiller")
 # User Input
 video_url = st.text_input("Enter YouTube URL:", placeholder="https://www.youtube.com/watch?v=...")
 
-# Sidebar for Settings
+# Check if the backend is alive
 with st.sidebar:
-    st.header("Status")
-    # We check if the backend is alive
+    st.header("Lab Status")
+    start_check = time.time()
+    latency = round((time.time() - start_check) * 1000)
     try:
-        health = requests.get("http://127.0.0.1:8000/")
+        health = requests.get(
+            "https://127.0.0.1:8000/", 
+            verify=False, 
+            timeout=5, 
+            allow_redirects=True
+        )
         if health.status_code == 200:
             st.success("Backend: Connected ✅")
-    except:
+            st.metric(label="Server Latency", value=f"{latency} ms", delta="- Low" if latency < 100 else "+ High", delta_color="inverse")
+        else:
+            st.warning(f"Backend: Status {health.status_code} ⚠️")
+    except Exception as e:
         st.error("Backend: Disconnected ❌")
+
+    st.divider()
+
+    # Lab Info
+    st.subheader("📜 Lab Records")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.caption("Version")
+        st.code("v1.2.0-beta")
+    with col2:
+        st.caption("Engine")
+        st.code("Gemini 2.0")
 
 # Action Button
 if st.button("Transmute to Summary"):
@@ -31,7 +52,7 @@ if st.button("Transmute to Summary"):
             try:
                 st.write("🔍 Extracting essence from YouTube...")
                 payload = {"url": video_url}
-                response = requests.post("http://127.0.0.1:8000/api/v1/summarize", json=payload)
+                response = requests.post("https://127.0.0.1:8000/api/v1/summarize", json=payload, verify=False)
 
                 if response.status_code == 200:
                     st.write("⚗️ Distilling insights with Gemini AI...")
@@ -57,10 +78,9 @@ if st.button("Transmute to Summary"):
 
         if data is not None:
             if data.get('status', 'error') == 'success':
-                '''
-                - Show main title
-                - Organizes content into three distinct sections for better user engagement
-                '''
+
+                # Show main title
+                # - Organizes content into three distinct sections for better user engagement
                 st.header(data.get('title', 'Summary Result'))
                 st.divider()
 
@@ -70,10 +90,8 @@ if st.button("Transmute to Summary"):
                     "📜 Transcript"
                 ])
 
-                '''
-                Display summary:
-                - Allow user to copy summary
-                '''
+                # Display summary:
+                # - Allow user to copy summary
                 with tab_summary:
                     st.subheader("📝 Summary")
                     st.write(data.get("summary"))
@@ -84,13 +102,11 @@ if st.button("Transmute to Summary"):
                         before_copy_label="📋 Copy Summary", 
                         after_copy_label="✅ Copied to Clipboard!"
                     )
- 
-                '''
-                Display key points:
-                - Create a single string of points for the copy-to-clipboard functionality
-                - Creates colored boxes for key points
-                - Allow user to copy all key takeaways at once
-                '''
+
+                # Display key points:
+                # - Create a single string of points for the copy-to-clipboard functionality
+                # - Creates colored boxes for key points
+                # - Allow user to copy all key takeaways at once
                 with tab_points:
                     st.subheader("✨ Key Takeaways")
                     points = data.get("key_points", [])
@@ -108,14 +124,12 @@ if st.button("Transmute to Summary"):
                     else:
                         st.info("The Alchemist didn't find specific key points.")
 
-                '''
-                Display transcript:
-                - Logic to display transcript only for Shorts to keep UI clean
-                - Display transcript in a scrollable container for better UX
-                - Add a small note to explain the quality improvement
-                - Allow user to copy transcript
-                - Informative note for long-form videos
-                '''
+                # Display transcript:
+                # - Logic to display transcript only for Shorts to keep UI clean
+                # - Display transcript in a scrollable container for better UX
+                # - Add a small note to explain the quality improvement
+                # - Allow user to copy transcript
+                # - Informative note for long-form videos
                 with tab_transcript:
                     if data.get("is_short"):
                         st.subheader("📜 Refined Transcript")
@@ -135,7 +149,6 @@ if st.button("Transmute to Summary"):
                             st.info("📜 **Empty Scroll:** This video contains no spoken essence for the Alchemist to transmute.")
                     else:
                         st.info("💡 Transcript hidden for brevity as this is a long-form video.")
-                # ------------------------------
             else:
                 fallback_title = "Transmutation Halted"
                 st.warning(f"🧙‍♂️ **Alchemist Note:** {data.get('title', fallback_title)}")

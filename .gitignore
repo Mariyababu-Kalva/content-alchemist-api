@@ -13,3 +13,6 @@ __pycache__/
 # IDE settings
 .vscode/
 .idea/
+
+# Private keys
+*.pem
