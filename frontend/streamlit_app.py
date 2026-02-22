@@ -9,7 +9,14 @@ st.title("🧪 Content Alchemist")
 st.markdown("### The AI-Powered YouTube Distiller")
 
 # User Input
-video_url = st.text_input("Enter YouTube URL:", placeholder="https://www.youtube.com/watch?v=...")
+with st.form("alchemist_form", clear_on_submit=False):
+    video_url = st.text_input(
+        "Enter YouTube URL:", 
+        placeholder="https://www.youtube.com/watch?v=..."
+    )
+    
+    # In a form, you MUST use st.form_submit_button instead of st.button
+    submit_button = st.form_submit_button("Transmute to Summary", type='primary')
 
 # Initialize version variable
 current_version = None
@@ -68,7 +75,7 @@ with st.sidebar:
         st.code(engine_display)
 
 # Action Button
-if st.button("Transmute to Summary"):
+if submit_button:
     if video_url:
         start_time = time.time()
         data = None
