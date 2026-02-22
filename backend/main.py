@@ -2,8 +2,12 @@ from fastapi import FastAPI
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from backend.routers import summarize
+from backend.core.config import settings
 
-app = FastAPI(title='Content Alchemist API')
+app = FastAPI(
+    title=settings.app_name,
+    version=settings.version
+)
 
 # This forces all incoming HTTP requests to redirect to HTTPS automatically
 app.add_middleware(HTTPSRedirectMiddleware)
@@ -21,4 +25,8 @@ app.include_router(summarize.router)
 
 @app.get('/')
 def read_root():
-    return {'message': 'Welcome to the Content Alchemist API. Alchemist Lab is Online and Secure (HTTPS)'}
+    return {
+        "status": "online",
+        "app_name": settings.app_name,
+        "version": settings.version
+    }

@@ -1,21 +1,25 @@
 import streamlit as st
 import requests
 import time
-from st_copy_to_clipboard import st_copy_to_clipboard # Import the new tool
+from st_copy_to_clipboard import st_copy_to_clipboard
 
 # UI Branding
-st.set_page_config(page_title="Content Alchemist", page_icon="🧪", layout="wide") # 'wide' helps with columns
+st.set_page_config(page_title="Content Alchemist", page_icon="🧪", layout="wide")
 st.title("🧪 Content Alchemist")
 st.markdown("### The AI-Powered YouTube Distiller")
 
 # User Input
 video_url = st.text_input("Enter YouTube URL:", placeholder="https://www.youtube.com/watch?v=...")
 
+# Initialize version variable
+current_version = None
+
 # Check if the backend is alive
 with st.sidebar:
     st.header("Lab Status")
+
+    col_status, col_refresh = st.columns([2, 1])
     start_check = time.time()
-    latency = round((time.time() - start_check) * 1000)
     try:
         health = requests.get(
             "https://127.0.0.1:8000/", 
@@ -23,13 +27,31 @@ with st.sidebar:
             timeout=5, 
             allow_redirects=True
         )
+
+        latency = round((time.time() - start_check) * 1000)
+
         if health.status_code == 200:
-            st.success("Backend: Connected ✅")
-            st.metric(label="Server Latency", value=f"{latency} ms", delta="- Low" if latency < 100 else "+ High", delta_color="inverse")
+            data = health.json()
+            current_version = data.get("version", "1.2.0-beta")
+
+            with col_status:
+                st.success("Connected ✅")
+            
+            with col_refresh:
+                if st.button("🔄", help="Refresh connection status"):
+                    st.rerun()
+
+            st.metric(label="Server Latency", value=f"{latency} ms", delta="- Low" if latency < 150 else "+ High", delta_color="inverse")
         else:
             st.warning(f"Backend: Status {health.status_code} ⚠️")
+            if st.button("🔄 Retry"):
+                st.rerun()
     except Exception as e:
-        st.error("Backend: Disconnected ❌")
+        with col_status:
+            st.error("Offline ❌")
+        with col_refresh:
+            if st.button("🔄", help="Try to reconnect"):
+                st.rerun()
 
     st.divider()
 
@@ -38,10 +60,12 @@ with st.sidebar:
     col1, col2 = st.columns(2)
     with col1:
         st.caption("Version")
-        st.code("v1.2.0-beta")
+        version_display = f"v{current_version}" if current_version else "N/A"
+        st.code(version_display)
     with col2:
         st.caption("Engine")
-        st.code("Gemini 2.0")
+        engine_display = "Gemini 2.0" if current_version else "OFFLINE"
+        st.code(engine_display)
 
 # Action Button
 if st.button("Transmute to Summary"):

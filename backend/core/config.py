@@ -7,7 +7,8 @@ class Settings(BaseSettings):
     google_api_key: str
     
     # App Settings
-    app_name: str = "Content Alchemist API"
+    app_name: str = "Content Alchemist"
+    version: str = "1.2.0-beta"
     debug: bool = False
 
     # This tells Pydantic to read from your .env file
