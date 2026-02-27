@@ -109,6 +109,11 @@ if submit_button:
 
         if data is not None:
             if data.get('status', 'error') == 'success':
+                if data.get('from_cache'):
+                    ts = data.get('distilled_at', 'an unknown time')
+                    st.info(f"📜 **Alchemist's Record:** This essence was retrieved from the archives (Distilled: {ts}).")
+                else:
+                    st.success("✨ **Fresh Transmutation:** The Alchemist has just distilled this video for you!")
 
                 # Show main title
                 # - Organizes content into three distinct sections for better user engagement

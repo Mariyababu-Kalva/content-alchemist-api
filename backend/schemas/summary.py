@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import List, Optional
 
 class SummaryRequest(BaseModel):
     """Schema for the incoming request."""
@@ -22,8 +23,7 @@ class SummaryResponse(BaseModel):
         ..., 
         description="A comprehensive but concise paragraph summarizing the video's main theme."
     )
-    # Adding extra fields makes API more "pro"
-    key_points: list[str] = Field(
+    key_points: List[str] = Field(
         default_factory=list,
         description="A list of the top 3-5 actionable takeaways from the video."
     )
@@ -38,4 +38,12 @@ class SummaryResponse(BaseModel):
     is_short: bool = Field(
         False, 
         description="Flag to identify if the video is a YouTube Short"
+    )
+    from_cache: bool = Field(
+        False,
+        description='Flag to identify if the transmutation is cached'
+    )
+    distilled_at: Optional[str] = Field(
+        None,
+        description="The timestamp of when this summary was first created."
     )
