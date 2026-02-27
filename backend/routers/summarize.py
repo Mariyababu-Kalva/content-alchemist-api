@@ -77,6 +77,10 @@ async def summarize_video(request: SummaryRequest):
             from datetime import datetime
             result_dict["distilled_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
+            # This ensures the folder exists right before try to write
+            if not os.path.exists(CACHE_DIR):
+                os.makedirs(CACHE_DIR)
+
             with open(cache_path, "w") as f:
                 json.dump(result_dict, f)
             

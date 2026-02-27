@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 import time
+import os
+import shutil
 from st_copy_to_clipboard import st_copy_to_clipboard
 
 # UI Branding
@@ -73,6 +75,30 @@ with st.sidebar:
         st.caption("Engine")
         engine_display = "Gemini 2.0" if current_version else "OFFLINE"
         st.code(engine_display)
+
+    st.divider()
+
+    # Add clear archives:
+    # Maintenance Section (The "Danger Zone")
+    st.subheader("🧹 Lab Maintenance")
+    with st.expander("Archive Management"):
+        st.caption("Erase all cached scrolls from local storage.")
+        if st.button("🔥 Clear All Archives", type="secondary", use_container_width=True):
+            try:
+                # Calculate path: looking for 'cache' folder in the root project directory
+                base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                cache_path = os.path.join(base_path, "cache")
+                
+                if os.path.exists(cache_path):
+                    shutil.rmtree(cache_path)
+                    os.makedirs(cache_path)
+                    st.toast("Archives purified by fire!", icon="🔥")
+                    time.sleep(1)
+                    st.rerun()
+                else:
+                    st.toast("Archives are already empty.", icon="📂")
+            except Exception as e:
+                st.error(f"Cleanup failed: {e}")
 
 # Action Button
 if submit_button:
